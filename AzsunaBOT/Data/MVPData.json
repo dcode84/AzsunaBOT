@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Bio3",
+    "minTime": 140,
+    "maxTime": 170
+  },
+  {
+    "name": "OHVillage",
+    "minTime": 60,
+    "maxTime": 70
+  },
+  {
+    "name": "Mistress",
+    "minTime": 120,
+    "maxTime": 130
+  },
+  {
+    "name": "WhiteLady",
+    "minTime": 116,
+    "maxTime": 126
+  }
+]
