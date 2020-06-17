@@ -1,8 +1,8 @@
 [
   {
     "name": "Bio3",
-    "minTime": 140,
-    "maxTime": 170
+    "minTime": 2,
+    "maxTime": 3
   },
   {
     "name": "OHVillage",

@@ -1,8 +1,10 @@
 ﻿using AzsunaBOT.Data;
+using AzsunaBOT.EventArgs;
 using AzsunaBOT.Helpers;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
+using DSharpPlus.EventArgs;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -16,29 +18,32 @@ using System.Threading.Tasks.Dataflow;
 
 namespace AzsunaBOT.Commands
 {
-    class MVPCommands : BaseCommandModule
+    public class MVPCommands : BaseCommandModule
     {
-        //private readonly List<MVPData> _timers = new List<MVPData>();
-        private readonly List<MVPTimer> _timers = new List<MVPTimer>();
-        private readonly List<MVPData> _jsonData = new List<MVPData>();
+        private readonly List<MVPData> _timers = new List<MVPData>();
+        private ThreadedTimer _timer;
+
+        public void OnTimerReaded(CommandContext context, object sender, TimerEventArgs e)
+        {
+
+        }
 
 
         [Command("mvp")]
         [Description("Sets or resets a certain MvP timer. \n**-r *MvPName*** to reset at once. \n**-t *MvPName number*** in minutes passed.")]
-        public async Task ResetMvp(CommandContext context, [Description("-r, -t or -s")]string parameter, [Description("MvP")]string name, [Description("Time")]int minutes = 0)
+        public async Task ResetMvp(CommandContext context, [Description("-r, -t or -v")]string parameter, [Description("MvP")]string name, [Description("Time")]int minutes = 0)
         {
             if (parameter == "-r")
-            {           
-                await StartTimer(name);
-                await StartTimerMessage(context, name, minutes).ConfigureAwait(false);
+            {
+                await StartTimer(context, name);
+                //await StartTimerMessage(context, name, minutes).ConfigureAwait(false);
             }
             else if (parameter == "-t")
             {
-                await StartTimerMessage(context, name, minutes).ConfigureAwait(false);
+                //await StartTimerMessage(context, name, minutes).ConfigureAwait(false);
             }
-            else if (parameter == "-s")
+            else if (parameter == "-v")
             {
-                await ShowTimeUntilVarianceMessage(context, name).ConfigureAwait(false);
             }
         }
 
@@ -50,7 +55,7 @@ namespace AzsunaBOT.Commands
             using(var sr = new StreamReader(fs, new UTF8Encoding(false)))
                 json = await sr.ReadToEndAsync().ConfigureAwait(false);
 
-            var mvpObject = JsonConvert.DeserializeObject<List<MVPTimer>>(json);
+            var mvpObject = JsonConvert.DeserializeObject<List<MVPData>>(json);
 
             foreach (var obj in mvpObject)
             {
@@ -70,14 +75,20 @@ namespace AzsunaBOT.Commands
             }
         }
 
-        public async Task StartTimer(string name)
+        public async Task StartTimer(CommandContext context, string name)
         {
             var requestedTimer = await GetMvpTimer(name.ToUpper());
 
-            requestedTimer.Timer.Start();
+            _timer = new ThreadedTimer(context,
+                                       requestedTimer.Name,
+                                       TimeSpan.FromMinutes((double)requestedTimer.MinTime),
+                                       TimeSpan.FromMinutes((double)requestedTimer.MaxTime));
+            _timer.Start();
+
+
         }
 
-        public async Task<MVPTimer> GetMvpTimer(string name)
+        public async Task<MVPData> GetMvpTimer(string name)
         {
             if (_timers.Count == 0)
             {
@@ -90,32 +101,9 @@ namespace AzsunaBOT.Commands
             {
                 return match;
             }
-            return null;
-        }
-
-        private async Task<int> CalculateTime(string name)
-        {
-            var requestedTimer = await GetMvpTimer(name.ToUpper());
-
-            var remainingTime = RemainingTimeCalculator.CalculateRemainingMinTime(requestedTimer.MinTime, (int)requestedTimer.Timer.ElapsedMilliseconds);
-
-            return remainingTime;
-        }
-
-        private async Task ShowTimeUntilVarianceMessage(CommandContext context, string name)
-        {
-            var requestedTimer = await GetMvpTimer(name.ToUpper());
-            var isRunning = requestedTimer.Timer.IsRunning;
-            var time = requestedTimer.Timer.ElapsedMilliseconds;
-            var remainingTime = await CalculateTime(name);
-
-            if (isRunning == false && time == 0)
-            {
-                await context.Channel.SendMessageAsync($"There is no running timer for **{name.ToUpper()}**");
-            }
             else
             {
-                await context.Channel.SendMessageAsync($"**{name.ToUpper()}** respawns in {remainingTime} minutes.");
+                return null;
             }
         }
 
