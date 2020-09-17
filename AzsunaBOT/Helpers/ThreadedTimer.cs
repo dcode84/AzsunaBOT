@@ -1,17 +1,15 @@
 ﻿using AzsunaBOT.EventArgs;
 using DSharpPlus.CommandsNext;
-using DSharpPlus.EventArgs;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
+using System.ComponentModel;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace AzsunaBOT.Helpers
 {
-    public class ThreadedTimer
+    public class ThreadedTimer : INotifyPropertyChanged
     {
+        private string _message;
+
         private readonly CommandContext _context;
         private string _name;
         private TimeSpan _minVarianceTimer;
@@ -51,9 +49,25 @@ namespace AzsunaBOT.Helpers
                 _currentTime = _minVarianceTimer - cache;
             }
         }
+        public string Message
+        {
+            get { return _message; }
+            set
+            {
+                if (value != _message)
+                {
+                    _message = value;
+                    OnMessageChanged(_message);
+
+                    _context.Channel.SendMessageAsync(_message);
+
+                }
+            }
+        }
 
         public delegate void TimerEventHandler(object sender, TimerEventArgs args);
         public event TimerEventHandler TimeReached;
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public ThreadedTimer(CommandContext context, string name, TimeSpan minVarianceTime, TimeSpan maxVarianceTime)
         {
@@ -72,6 +86,12 @@ namespace AzsunaBOT.Helpers
         public void OnTimeReached(string message)
         {
             TimeReached?.Invoke(this, new TimerEventArgs(message));
+            Message = message;
+        }
+
+        protected virtual void OnMessageChanged(string message)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(message));
         }
 
         public void Start()

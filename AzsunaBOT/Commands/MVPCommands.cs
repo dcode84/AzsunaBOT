@@ -1,20 +1,15 @@
 ﻿using AzsunaBOT.Data;
 using AzsunaBOT.EventArgs;
 using AzsunaBOT.Helpers;
-using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.EventArgs;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading.Tasks;
-using System.Threading.Tasks.Dataflow;
 
 namespace AzsunaBOT.Commands
 {
@@ -31,7 +26,7 @@ namespace AzsunaBOT.Commands
 
         [Command("mvp")]
         [Description("Sets or resets a certain MvP timer. \n**-r *MvPName*** to reset at once. \n**-t *MvPName number*** in minutes passed.")]
-        public async Task ResetMvp(CommandContext context, [Description("-r, -t or -v")]string parameter, [Description("MvP")]string name, [Description("Time")]int minutes = 0)
+        public async Task ResetMvp(CommandContext context, [Description("-r, -t or -v")] string parameter, [Description("MvP")] string name, [Description("Time")] int minutes = 0)
         {
             if (parameter == "-r")
             {
@@ -51,8 +46,8 @@ namespace AzsunaBOT.Commands
         {
             var json = string.Empty;
 
-            using(var fs = File.OpenRead(@"E:\programpls\Projects\AzsunaBOT\AzsunaBOT\Data\MVPData.json"))
-            using(var sr = new StreamReader(fs, new UTF8Encoding(false)))
+            using (var fs = File.OpenRead(@"C:\Repos\AzsunaBOT\AzsunaBOT\Data\MVPData.json"))
+            using (var sr = new StreamReader(fs, new UTF8Encoding(false)))
                 json = await sr.ReadToEndAsync().ConfigureAwait(false);
 
             var mvpObject = JsonConvert.DeserializeObject<List<MVPData>>(json);
