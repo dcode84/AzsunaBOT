@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace AzsunaBOT
+﻿namespace AzsunaBOT
 {
     class Program
     {

@@ -1,42 +1,36 @@
 ﻿using AzsunaBOT.Data;
 using AzsunaBOT.Helpers;
-using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading.Tasks;
-using System.Threading.Tasks.Dataflow;
 
 namespace AzsunaBOT.Commands
 {
     class MVPCommands : BaseCommandModule
     {
-        //private readonly List<MVPData> _timers = new List<MVPData>();
         private readonly List<MVPTimer> _timers = new List<MVPTimer>();
-        private readonly List<MVPData> _jsonData = new List<MVPData>();
 
 
         [Command("mvp")]
-        [Description("Sets or resets a certain MvP timer. \n**-r *MvPName*** to reset at once. \n**-t *MvPName number*** in minutes passed.")]
-        public async Task ResetMvp(CommandContext context, [Description("-r, -t or -s")]string parameter, [Description("MvP")]string name, [Description("Time")]int minutes = 0)
+        [Description("Sets or resets a certain MvP timer. \n**-r *MvPName*** to reset at once. \n**-t *MvPName number*** in minutes passed. \n**-v *MvPName* to show time until variance**")]
+        public async Task ResetMvp(CommandContext context, [Description("-r, -t, -v")] string parameter, [Description("MvP")] string name, [Description("Time")] int minutes = 0)
         {
             if (parameter == "-r")
-            {           
+            {
                 await StartTimer(name);
                 await StartTimerMessage(context, name, minutes).ConfigureAwait(false);
             }
             else if (parameter == "-t")
             {
-                await StartTimerMessage(context, name, minutes).ConfigureAwait(false);
+                await context.Channel.SendMessageAsync("not implemented yet.");
+                //await StartTimerMessage(context, name, minutes).ConfigureAwait(false);
             }
-            else if (parameter == "-s")
+            else if (parameter == "-v")
             {
                 await ShowTimeUntilVarianceMessage(context, name).ConfigureAwait(false);
             }
@@ -46,8 +40,8 @@ namespace AzsunaBOT.Commands
         {
             var json = string.Empty;
 
-            using(var fs = File.OpenRead(@"E:\programpls\Projects\AzsunaBOT\AzsunaBOT\Data\MVPData.json"))
-            using(var sr = new StreamReader(fs, new UTF8Encoding(false)))
+            using (var fs = File.OpenRead("MVPData.json"))
+            using (var sr = new StreamReader(fs, new UTF8Encoding(false)))
                 json = await sr.ReadToEndAsync().ConfigureAwait(false);
 
             var mvpObject = JsonConvert.DeserializeObject<List<MVPTimer>>(json);
@@ -75,6 +69,7 @@ namespace AzsunaBOT.Commands
             var requestedTimer = await GetMvpTimer(name.ToUpper());
 
             requestedTimer.Timer.Start();
+
         }
 
         public async Task<MVPTimer> GetMvpTimer(string name)
@@ -115,7 +110,7 @@ namespace AzsunaBOT.Commands
             }
             else
             {
-                await context.Channel.SendMessageAsync($"**{name.ToUpper()}** respawns in {remainingTime} minutes.");
+                await context.Channel.SendMessageAsync($"**{name.ToUpper()}** variance begins in {remainingTime} minutes.");
             }
         }
 
