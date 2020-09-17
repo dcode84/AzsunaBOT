@@ -1,9 +1,10 @@
 ﻿using AzsunaBOT.Commands;
-using AzsunaBOT.Helpers.Messages;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.EventArgs;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,13 +31,14 @@ namespace AzsunaBOT
                 Token = configJson.Token,
                 TokenType = TokenType.Bot,
                 AutoReconnect = true,
-                MinimumLogLevel = Microsoft.Extensions.Logging.LogLevel.Debug,
+                LogLevel = LogLevel.Debug,
+                UseInternalLogHandler = true
             };
 
             Client = new DiscordClient(config);
 
             Client.Ready += OnClientReady;
-            Client.MessageCreated += MessageListener.OnMessageSent;
+            Client.MessageCreated += UWUCommands.OnUwUSend;
 
             var commandsConfig = new CommandsNextConfiguration()
             {
