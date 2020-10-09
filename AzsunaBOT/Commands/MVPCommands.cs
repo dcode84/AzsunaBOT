@@ -1,125 +1,215 @@
 ﻿using AzsunaBOT.Data;
-using AzsunaBOT.EventArgs;
 using AzsunaBOT.Helpers;
+using AzsunaBOT.Helpers.Message;
+using AzsunaBOT.Helpers.Processes;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace AzsunaBOT.Commands
 {
     public class MVPCommands : BaseCommandModule
     {
-        private readonly List<MVPData> _mvpDataList = new List<MVPData>();
-        private readonly List<ThreadedTimer> _timerList = new List<ThreadedTimer>();
+        private List<MVPData> _mvpDataList = new List<MVPData>();
+        private readonly List<ThreadedTimer> _threadList = new List<ThreadedTimer>();
+        private readonly List<ThreadedTimer> _deadList = new List<ThreadedTimer>();
+        
+        private readonly string[] _validParametersArray = { "-s", "-r", "-i", "-v", "-t", "-tr", "-l" };
+        
+        private bool _containsTimer;
+        private string _name;
         private ThreadedTimer _timer;
-
+        
+        public MVPCommands()
+        {
+            try { _mvpDataList = JsonDataProcessor.DeserializeMvpDataAsync("MVPData.json").Result; }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+        }
 
         [Command("mvp")]
-        [Description("Sets or resets a certain MvP timer. \n**-r *MvPName*** to reset or start. \n**-v *MvPName** to show time until variance*")]
-        public async Task ResetMvp(CommandContext context, [Description("-r or -v")] string parameter, [Description("MvP")] string name, [Description("Time")] int minutes = 0)
+        [Description("soon")]
+        public async Task Mvp(CommandContext context, [Description("Parameter")] string param = null, [Description("MvP")] string mvpname = null, [Description("Time")] string time = null)
         {
-            if (parameter == "-r")
-            {
-                await StartTimer(context, name.ToUpper(), parameter);
-                
-            }
-            else if (parameter == "-v")
-            {
-                if (_timer != null)
-                {
-                    _timer = _timerList.SingleOrDefault(t => t.Name.ToUpper() == name.ToUpper());
-                    _timer.GetTimeUntilVariance(context);
-                    
-                }
-                else
-                    await context.Channel.SendMessageAsync($"Please start a timer before you use this parameter. Thx bruh.");
-            }
-            else if (parameter == "-s")
-            {
-                _timer = _timerList.SingleOrDefault(t => t.Name.ToUpper() == name.ToUpper());
-                //_timer = _timerList.Find(t => t.Name.ToUpper() == name.ToUpper());
+            var parameter = string.Empty;
 
-                if (_timer == null)
-                {
-                    await context.Channel.SendMessageAsync($"There is no running timer for {name.ToUpper()}");
-                    return;
-                }
-                else
-                {
-                    _timerList.Remove(_timer);
-                    _timer.Abort();
-                    //_timer = null;
-                }
+            if (_validParametersArray.Contains(param) 
+                && _mvpDataList.Any(mvp => mvp.Name.ToUpper() == mvpname.ToUpper()))
+            {
+                char[] charToTrim = { '-' };
+                _name = mvpname.ToUpper();
+                _timer = _threadList.SingleOrDefault(t => t.Name.ToUpper() == _name);
+                _containsTimer = _threadList.Any(item => item.Name.ToUpper() == _name);
+                parameter = param.Trim(charToTrim);
+            }
+            else
+            {
+                await TimerMessager.UnknownCredentialsMessage(context);
+                return;
+            }
 
+            switch (parameter)
+            {
+                case "s":
+                    await StartTimerAsync(context, _name, parameter);
+                    break;
+
+                case "r":
+                    await ResetTimerAsync(context, _name, parameter);
+                    break;
+
+                case "i":
+                    await InterruptTimerAsync(context, _name, parameter);
+                    break;
+
+                case "v":
+                    try { _timer.GetTimeUntilVariance(context); }
+                    catch (Exception e)
+                    {
+                        await TimerMessager.SomethingWentWrongMessage(context);
+                        Console.WriteLine(e.Message);
+                    }
+                    break;
+
+                case "t":
+                case "tr":
+                    await StartExactTimerAsync(context, _name, parameter, time);
+                    break;
+
+                case "l":
+
+                    break;
+
+                default:
+                    await TimerMessager.SomethingWentWrongMessage(context);
+                    break;
             }
         }
 
-        public async Task LoadJsonDataAsync()
+        //public Task AddThreadToList(string name)
+        //{
+        //    _containsTimer = _threadList.Any(item => item.Name.ToUpper() == _name);
+
+        //    if (_containsTimer == false)
+        //        _threadList.Add(_timer);
+
+        //    return Task.CompletedTask;
+        //}        
+        
+        //public Task RemoveThreadFromList(string name)
+        //{
+        //    _timer = _threadList.SingleOrDefault(t => t.Name.ToUpper() == _name);
+        //    _containsTimer = _threadList.Any(item => item.Name.ToUpper() == _name);
+
+        //    if (_containsTimer == true)
+        //        _threadList.Remove(_timer);
+
+        //    return Task.CompletedTask;
+        //}
+
+        private async Task StartTimerAsync(CommandContext context, string name, string parameter, DateTime? killTime = null)
         {
-            var json = string.Empty;
+            var requestedTimer = await GetMvpTimerValuesAsync(context, name);
 
-            using (var fs = File.OpenRead(@"C:\Repos\AzsunaBOT\AzsunaBOT\Data\MVPData.json"))
-            using (var sr = new StreamReader(fs, new UTF8Encoding(false)))
-                json = await sr.ReadToEndAsync().ConfigureAwait(false);
-
-            var mvpObject = JsonConvert.DeserializeObject<List<MVPData>>(json);
-
-            foreach (var obj in mvpObject)
-            {
-                _mvpDataList.Add(obj);
-            }
-        }
-
-        public async Task StartTimer(CommandContext context, string name, string parameter)
-        {
-            var requestedTimer = await GetMvpTimer(context, name);
-            bool containsTimer = _timerList.Any(item => item.Name.ToUpper() == name);
-
-            if (requestedTimer != null && containsTimer == false)
+            if (requestedTimer != null && _containsTimer == false)
             {
 
                 _timer = new ThreadedTimer(context,
                                            requestedTimer.Name,
                                            TimeSpan.FromMinutes((double)requestedTimer.MinTime),
-                                           TimeSpan.FromMinutes((double)requestedTimer.MaxTime));
-                _timer.Start();
+                                           TimeSpan.FromMinutes((double)requestedTimer.MaxTime),
+                                           killTime);
+                await _timer.Start();
+                _timer.IsRunning = true;
+                _threadList.Add(_timer);
 
-                _timerList.Add(_timer);
+                return;
             }
-            else if (containsTimer)
+            else if (_timer.IsRunning)
             {
-                if(parameter == "-r")
-                {
-                    _timerList.RemoveAll(n => n.Name.ToUpper() == name);
-                    await context.Channel.SendMessageAsync($"Timer for **{name}** has been reset.");
-                    await StartTimer(context, name, parameter);
-                }
-            }                
-            else
-                await context.Channel.SendMessageAsync($"Something went wrong. NULL value found.");
+                await TimerMessager.TimerIsRunningMessage(context, name);
+                return;
+            }
+
+            await TimerMessager.SomethingWentWrongMessage(context);
         }
 
-        public async Task<MVPData> GetMvpTimer(CommandContext context, string name)
+        private async Task StartExactTimerAsync(CommandContext context, string name, string parameter, string time)
         {
-            if (_mvpDataList.Count == 0)
+            DateTime parsedDate;
+            string pattern = "HH:mm:ss";
+
+            DateTime.TryParseExact(time, pattern, null, DateTimeStyles.None, out parsedDate);
+
+            if (_containsTimer == false && parameter == "t")
             {
-                await LoadJsonDataAsync();
+                await TimerMessager.ExactTimerMessage(context, name, parsedDate);
+                await StartTimerAsync(context, _name, parameter, parsedDate);
+            }
+            else if (parameter == "tr")
+            {
+                if (_containsTimer)
+                {
+                    await InterruptTimerAsync(context, name, parameter);
+                    await StartTimerAsync(context, _name, parameter, parsedDate);
+
+                    return;
+                }
+                await TimerMessager.TimerNotRunningMessage(context, name);
+            }
+        }
+
+        private async Task InterruptTimerAsync(CommandContext context, string name, string parameter)
+        {
+            if (_timer != null)
+            {
+                await _timer.Abort();
+                _timer.IsRunning = false;
+                _deadList.Add(_timer);
+                _threadList.Remove(_timer);
+            }
+            else
+                await TimerMessager.TimerNotRunningMessage(context, name);
+        }
+
+        private async Task ResetTimerAsync(CommandContext context, string name, string parameter)
+        {
+            if (_containsTimer)
+            {
+                await InterruptTimerAsync(context, name, parameter);
+                await StartTimerAsync(context, name, parameter);
+
+                return;
             }
 
+            await TimerMessager.TimerNotRunningMessage(context, name);
+        }
+
+        private async Task<MVPData> GetMvpTimerValuesAsync(CommandContext context, string name)
+        {
             var match = _mvpDataList.FirstOrDefault(n => n.Name.ToUpper() == name);
 
             if (match != null)
                 return match;
             else
-                await context.Channel.SendMessageAsync($"*{name}* does not exist in the list currently. Contact a dev for it.");
+                await TimerMessager.TimerNotFoundMessage(context, name);
 
-            return null;            
+            return null;
         }
+
+        //private async Task<Task> ListTimersAsync(CommandContext context)
+        //{
+        //    return Task.CompletedTask;
+        //}
     }
 }

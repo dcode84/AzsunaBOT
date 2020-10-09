@@ -1,9 +1,11 @@
 ﻿using AzsunaBOT.EventArgs;
+using AzsunaBOT.Helpers.Message;
+using AzsunaBOT.Commands;
 using DSharpPlus.CommandsNext;
 using System;
 using System.ComponentModel;
-using System.Runtime.InteropServices.ComTypes;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace AzsunaBOT.Helpers
 {
@@ -12,30 +14,23 @@ namespace AzsunaBOT.Helpers
         public const int EarlyReminderInMinutes = 1;
 
         private string _message;
-        private TimeSpan _minVarianceTimer;
-        private TimeSpan _maxVarianceTimer;
+        private string _name;
+
+        private readonly TimeSpan _minVarianceTimer;
+        private readonly TimeSpan _maxVarianceTimer;
+
         private DateTime _nextWakeUp;
         private DateTime _endOfVariance;
         private DateTime _earlyReminder;
-        private string _name;
+
+        private DateTime? _killTime { get; set; }
+
         private bool _running;
+
         private readonly CommandContext _context;
         private readonly Thread _thread;
 
-
         public string Name { get => _name; set => _name = value; }
-
-        //public TimeSpan MinVarianceTimer
-        //{
-        //    get => _minVarianceTimer;
-        //    set => _minVarianceTimer = value;
-        //}
-
-        //public TimeSpan MaxVarianceTimer
-        //{
-        //    get => _maxVarianceTimer;
-        //    set => _maxVarianceTimer = value;
-        //}
 
         public string Message
         {
@@ -52,16 +47,20 @@ namespace AzsunaBOT.Helpers
             }
         }
 
-        public delegate void TimerEventHandler(object sender, TimerEventArgs args);
-        public event TimerEventHandler TimeReached;
-        public event PropertyChangedEventHandler PropertyChanged;
+        public bool IsRunning { get => _running; set => _running = value; }
 
-        public ThreadedTimer(CommandContext context, string name, TimeSpan minVarianceTime, TimeSpan maxVarianceTime)
+        public ThreadedTimer(CommandContext context, string name, TimeSpan minVarianceTime, TimeSpan maxVarianceTime, DateTime? killTime)
         {
-            this._context = context;
-            this._name = name.ToUpper();
-            this._minVarianceTimer = minVarianceTime;
-            this._maxVarianceTimer = maxVarianceTime;
+            _context = context;
+            _name = name.ToUpper();
+            _minVarianceTimer = minVarianceTime;
+            _maxVarianceTimer = maxVarianceTime;
+            _killTime = killTime;
+
+            if (_killTime == null)
+            {
+                _killTime = DateTime.UtcNow;
+            }
 
             _thread = new Thread(TimerThread)
             {
@@ -70,50 +69,63 @@ namespace AzsunaBOT.Helpers
             };
         }
 
-        protected virtual void OnTimeReached(string message)
+        public delegate void TimerEventHandler(object sender, TimerEventArgs args);
+        public event TimerEventHandler TimeReached;
+        public event PropertyChangedEventHandler PropertyChanged;
+        
+        protected virtual Task OnTimeReached(string message)
         {
             TimeReached?.Invoke(this, new TimerEventArgs(message));
             Message = message;
+
+            return Task.CompletedTask;
         }
 
-        protected virtual void OnMessageChanged(string message)
+        protected virtual Task OnMessageChanged(string message)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(message));
+
+            return Task.CompletedTask;
         }
 
-        public void Start()
+        public Task Start()
         {
-            try
+            try 
             {
-                OnTimeReached($"**{_name} **: Timer has started. ");
                 _thread.Start();
+                _running = true;
             }
             catch { }
+            finally { OnTimeReached($"**{_name} **: Timer has started. "); }
+         
+            return Task.CompletedTask;
         }
 
-        public void Abort()
+        public Task Abort()
         {
             try
             {
-                OnTimeReached($"**{_name} **: Timer has aborted/stopped. ");
+                
+                _thread.Abort();
                 _running = false;
-                _thread.Interrupt();
             }
             catch { }
+            finally { OnTimeReached($"**{_name} **: Timer has aborted/stopped. "); }
+
+            return Task.CompletedTask;
         }
 
         public async void GetTimeUntilVariance(CommandContext context)
         {
             var cache = _nextWakeUp.Subtract(DateTime.UtcNow);
 
-            await context.Channel.SendMessageAsync($"**{_name}** : Variance starts in {cache.Hours} hours and {cache.Minutes} minutes.");
-
+            await TimerMessager.ShowTimeUntilVarianceMessage(context, _name, cache);
         }
 
         private void TimerThread()
         {
-            _nextWakeUp = DateTime.UtcNow + _minVarianceTimer;
-            _endOfVariance = DateTime.UtcNow + _maxVarianceTimer;
+            _nextWakeUp = (DateTime)_killTime + _minVarianceTimer;
+            _endOfVariance = (DateTime)_killTime + _maxVarianceTimer;
             _earlyReminder = _nextWakeUp.AddMinutes(-EarlyReminderInMinutes);
 
             var earlyReminderTs = _earlyReminder.Subtract(DateTime.UtcNow);
@@ -124,34 +136,36 @@ namespace AzsunaBOT.Helpers
             {
                 Thread.Sleep((int)earlyReminderTs.TotalMilliseconds);
 
-                if (_earlyReminder < DateTime.UtcNow)
+                if (_earlyReminder < DateTime.UtcNow && _running)
                 {
                     try
                     {
                         OnTimeReached($"**{_name} **: Only five minutes until variance starts.");
                     }
                     catch { }
+
                     Thread.Sleep((int)fiveMinutesUntilVariance.TotalMilliseconds);
                 }
 
-                if (_nextWakeUp < DateTime.UtcNow)
+                if (_nextWakeUp < DateTime.UtcNow && _running)
                 {
                     try
                     {
                         OnTimeReached($"**{_name} **: Variance has started.");
                     }
                     catch { }
+
                     Thread.Sleep((int)maxVarianceReminderTs.TotalMilliseconds);
                 }
 
-                if (_endOfVariance < DateTime.UtcNow)
+                if (_endOfVariance < DateTime.UtcNow && _running)
                 {
                     try
                     {
-                        OnTimeReached($"**{_name} **: Variance has ended and the MvP has spawned for sure. Check the map again");
-                        _thread.Interrupt();
+                        _thread.Abort();
                     }
                     catch { }
+                    finally { OnTimeReached($"**{_name} **: Variance has ended and the MvP has spawned for sure. Check the map again"); };
                 }
                 break;
             }
