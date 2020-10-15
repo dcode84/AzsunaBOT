@@ -41,6 +41,11 @@ namespace AzsunaBOT.Helpers.Message
             return await context.Channel.SendMessageAsync($"Idk what you want me to do bruh. A valid parameter and mvp must be passed to this command.");
 
         }
+        public static async Task<DiscordMessage> ResetTimerMessage(CommandContext context, string name)
+        {
+            return await context.Channel.SendMessageAsync($"**{name}** : Resetting timer.");
+
+        }
 
         public static async Task<DiscordMessage> ExactTimerMessage(CommandContext context, string name, DateTime parsedDate)
         {
@@ -52,7 +57,7 @@ namespace AzsunaBOT.Helpers.Message
         public static async Task<DiscordMessage> DisplayRunningTimersMessage(CommandContext context, List<MVPData> timerList)
         {
             return await context.Channel.SendMessageAsync($"");
-            
+
         }
     }
 }

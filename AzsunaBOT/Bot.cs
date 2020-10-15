@@ -55,7 +55,7 @@ namespace AzsunaBOT
             await Task.Delay(-1);
         }
 
-        private Task OnClientReady(DiscordClient client,ReadyEventArgs e)
+        private Task OnClientReady(DiscordClient client, ReadyEventArgs e)
         {
             return Task.CompletedTask;
         }
