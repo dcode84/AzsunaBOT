@@ -1,4 +1,5 @@
 ﻿
+using AzsunaBOT.Data;
 using AzsunaBOT.EventArgs;
 using DSharpPlus.CommandsNext;
 using System;
@@ -29,9 +30,10 @@ namespace AzsunaBOT.Helpers
         private bool _earlyReminderFlag = false;
         private bool _varianceFlag = false;
         private bool _maxTimeFlag = false;
+        private bool _isInVariance = false;
 
         private DateTime? _killTime;
-        private DateTime _nextWakeUp;
+        private DateTime _varianceStart;
         private DateTime _endOfVariance;
         private DateTime _earlyReminder;
 
@@ -51,6 +53,9 @@ namespace AzsunaBOT.Helpers
         }
         public string Name { get => _name; set => _name = value; }
         public bool IsRunning { get; private set; }
+        public DateTime? KillTime { get => _killTime; set => _killTime = value; }
+        public DateTime VarianceStart { get => _varianceStart; set => _varianceStart = value; }
+        public bool IsInVariance { get => _isInVariance; set => _isInVariance = value; }
 
         public delegate void TimerEventHandler(object sender, TimerEventArgs args);
         public event TimerEventHandler TimeReached;
@@ -69,9 +74,9 @@ namespace AzsunaBOT.Helpers
                 _killTime = DateTime.UtcNow;
             }
 
-            _nextWakeUp = (DateTime)_killTime + _minVarianceTime;
+            _varianceStart = (DateTime)_killTime + _minVarianceTime;
             _endOfVariance = (DateTime)_killTime + _maxVarianceTime;
-            _earlyReminder = _nextWakeUp.AddMinutes(-EarlyReminderInMinutes);
+            _earlyReminder = _varianceStart.AddMinutes(-EarlyReminderInMinutes);
         }
 
         public Task Start()
@@ -121,14 +126,16 @@ namespace AzsunaBOT.Helpers
                 OnTimeReached($"**{_name} **: Only five minutes until variance starts.");
                 _earlyReminderFlag = true;
             }
-            if (_nextWakeUp < DateTime.UtcNow && _varianceFlag == false)
+            if (_varianceStart < DateTime.UtcNow && _varianceFlag == false)
             {
+                _isInVariance = true;
                 OnTimeReached($"**{_name} **: Variance has started.");
                 _varianceFlag = true;
             }
             if (_endOfVariance < DateTime.UtcNow && _maxTimeFlag == false)
             {
                 OnTimeReached($"**{_name} **: Variance has ended and the MvP has spawned for sure. Check the map again");
+                MVPTimerList.Remove(this);
                 _maxTimeFlag = true;
             }
         }

@@ -3,13 +3,13 @@ using AzsunaBOT.Data;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace AzsunaBOT.Helpers.Message
 {
     public static class TimerMessager
     {
+
         public static async Task<DiscordMessage> TimerNotFoundMessage(CommandContext context, string name)
         {
             return await context.Channel.SendMessageAsync($"**{name}** : Currently there is no known reference to this MvP. " +
@@ -54,10 +54,15 @@ namespace AzsunaBOT.Helpers.Message
                                                           $"{parsedDate.Second:00.##}");
         }
 
-        public static async Task<DiscordMessage> DisplayRunningTimersMessage(CommandContext context, List<MVPData> timerList)
+        public static async Task DisplayRunningTimersMessage(CommandContext context)
         {
-            return await context.Channel.SendMessageAsync($"");
-
+            foreach (var mvp in MVPTimerList._list)
+            {
+                await context.Channel.SendMessageAsync($"**{mvp.Name}** : " +
+                                                        $"**Killed** : {mvp.KillTime.Value:HH:mm:ss} " +
+                                                        $"**Variance** : {mvp.VarianceStart:HH:mm:ss} " +
+                                                        $"**InVariance** : {mvp.IsInVariance}");
+            }
         }
     }
 }

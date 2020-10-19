@@ -35,17 +35,24 @@ namespace AzsunaBOT.Commands
 
         [Command("mvp")]
         [Description("soon")]
-        public async Task Mvp(CommandContext context, [Description("Parameter")] string param = null, [Description("MvP")] string mvpname = null, [Description("Time")] string time = null)
+        public async Task Mvp(CommandContext context, [Description("Parameter")] string param = null, [Description("MvP")] string mvpname = "", [Description("Time")] string time = null)
         {
             var parameter = string.Empty;
 
-            if (_validParametersArray.Contains(param)
-                && _mvpDataList.Any(mvp => mvp.Name.ToUpper() == mvpname.ToUpper()))
+            if (_validParametersArray.Contains(param))
             {
                 char[] charToTrim = { '-' };
-                _name = mvpname.ToUpper();
                 parameter = param.Trim(charToTrim);
-                _containsTimer = _timerList.Any(t => t.Name.ToUpper() == _name);
+
+                if (_mvpDataList.Any(mvp => mvp.Name.ToUpper() == mvpname.ToUpper()))
+                {
+                    _name = mvpname.ToUpper();
+                    _containsTimer = MVPTimerList.Check(_name);
+                    if (_containsTimer)
+                    {
+                        _timer = MVPTimerList.GetTimerObject(_name);
+                    }
+                }
             }
             else
             {
@@ -68,7 +75,6 @@ namespace AzsunaBOT.Commands
                     break;
 
                 case "v":
-                    // Variance check method call here
                     break;
 
                 case "t":
@@ -78,6 +84,7 @@ namespace AzsunaBOT.Commands
 
                 case "l":
                     // Listing timer method call here
+                    await TimerMessager.DisplayRunningTimersMessage(context);
                     break;
 
                 default:
@@ -97,7 +104,7 @@ namespace AzsunaBOT.Commands
                                       TimeSpan.FromMinutes((double)requestedTimer.MinTime),
                                       TimeSpan.FromMinutes((double)requestedTimer.MaxTime),
                                       killTime);
-                _timerList.Add(_timer);
+                MVPTimerList.Add(_timer);
                 await _timer.Start();
 
                 return;
@@ -136,27 +143,33 @@ namespace AzsunaBOT.Commands
             }
         }
 
-        private Task InterruptTimerAsync(CommandContext context, string name, string parameter)
+        private async Task InterruptTimerAsync(CommandContext context, string name, string parameter)
         {
-            // Timer interruption logic here
-            GetTimerObject(name);
-            _timer.Stop();
-            _timerList.Remove(_timer);
+            if (_containsTimer == false)
+            {
+                await TimerMessager.TimerNotRunningMessage(context, name);
+                return;
+            }
 
-            //await TimerMessager.TimerNotRunningMessage(context, name);
-            return Task.CompletedTask;
+            // Timer interruption logic here
+            await _timer.Stop();
+            MVPTimerList.Remove(_timer);
         }
 
         private async Task ResetTimerAsync(CommandContext context, string name, string parameter)
         {
+            if (_containsTimer == false)
+            {
+                await TimerMessager.TimerNotRunningMessage(context, name);
+                return;
+            }
+
             // Timer reset logic here
             await InterruptTimerAsync(context, name, parameter);
 
             await TimerMessager.ResetTimerMessage(context, name);
 
             await StartTimerAsync(context, name, parameter);
-
-            //await TimerMessager.TimerNotRunningMessage(context, name);
         }
 
         private async Task<MVPData> GetMvpTimerValuesAsync(CommandContext context, string name)
@@ -170,12 +183,5 @@ namespace AzsunaBOT.Commands
 
             return null;
         }
-
-        private MVPTimer GetTimerObject(string name) => _timer = _timerList.SingleOrDefault(t => t.Name.ToUpper() == name);
-        //{
-
-
-        //    return Task.CompletedTask;
-        //}
     }
 }

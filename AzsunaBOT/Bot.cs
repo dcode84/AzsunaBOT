@@ -12,8 +12,8 @@ namespace AzsunaBOT
 {
     public class Bot
     {
-        public DiscordClient Client { get; private set; }
-        public CommandsNextExtension Commands { get; private set; }
+        private DiscordClient _client { get; set; }
+        private CommandsNextExtension _commands { get; set; }
 
         public async Task RunAsync()
         {
@@ -33,10 +33,10 @@ namespace AzsunaBOT
                 MinimumLogLevel = Microsoft.Extensions.Logging.LogLevel.Debug
             };
 
-            Client = new DiscordClient(config);
+            _client = new DiscordClient(config);
 
-            Client.Ready += OnClientReady;
-            Client.MessageCreated += MessageListener.OnMessageSent;
+            _client.Ready += OnClientReady;
+            _client.MessageCreated += MessageListener.OnMessageSent;
 
             var commandsConfig = new CommandsNextConfiguration()
             {
@@ -46,11 +46,11 @@ namespace AzsunaBOT
                 DmHelp = true
             };
 
-            Commands = Client.UseCommandsNext(commandsConfig);
-            Commands.RegisterCommands<MVPCommands>();
-            Commands.RegisterCommands<UWUCommands>();
+            _commands = _client.UseCommandsNext(commandsConfig);
+            _commands.RegisterCommands<MVPCommands>();
+            _commands.RegisterCommands<UWUCommands>();
 
-            await Client.ConnectAsync();
+            await _client.ConnectAsync();
 
             await Task.Delay(-1);
         }
