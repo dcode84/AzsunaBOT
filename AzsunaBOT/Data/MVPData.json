@@ -1,8 +1,8 @@
 [
   {
     "name": "Bio3",
-    "minTime": 140,
-    "maxTime": 170
+    "minTime": 100,
+    "maxTime": 130
   },
   {
     "name": "OHVillage",
@@ -18,5 +18,30 @@
     "name": "WhiteLady",
     "minTime": 116,
     "maxTime": 126
+  },
+  {
+    "name": "Moonlight",
+    "minTime": 60,
+    "maxTime": 70
+  },
+  {
+    "name": "GTB",
+    "minTime": 60,
+    "maxTime": 70
+  },
+  {
+    "name": "LoD",
+    "minTime": 133,
+    "maxTime": 133
+  },
+  {
+    "name": "Doppel",
+    "minTime": 120,
+    "maxTime": 130
+  },
+  {
+    "name": "Eddga",
+    "minTime": 120,
+    "maxTime": 130
   }
 ]

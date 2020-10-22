@@ -1,10 +1,9 @@
 ﻿using AzsunaBOT.Commands;
+using AzsunaBOT.Helpers.Message;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.EventArgs;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,8 +12,8 @@ namespace AzsunaBOT
 {
     public class Bot
     {
-        public DiscordClient Client { get; private set; }
-        public CommandsNextExtension Commands { get; private set; }
+        private DiscordClient _client { get; set; }
+        private CommandsNextExtension _commands { get; set; }
 
         public async Task RunAsync()
         {
@@ -31,14 +30,13 @@ namespace AzsunaBOT
                 Token = configJson.Token,
                 TokenType = TokenType.Bot,
                 AutoReconnect = true,
-                LogLevel = LogLevel.Debug,
-                UseInternalLogHandler = true
+                MinimumLogLevel = Microsoft.Extensions.Logging.LogLevel.Debug
             };
 
-            Client = new DiscordClient(config);
+            _client = new DiscordClient(config);
 
-            Client.Ready += OnClientReady;
-            Client.MessageCreated += UWUCommands.OnUwUSend;
+            _client.Ready += OnClientReady;
+            _client.MessageCreated += MessageListener.OnMessageSent;
 
             var commandsConfig = new CommandsNextConfiguration()
             {
@@ -48,18 +46,19 @@ namespace AzsunaBOT
                 DmHelp = true
             };
 
-            Commands = Client.UseCommandsNext(commandsConfig);
-            Commands.RegisterCommands<MVPCommands>();
-            Commands.RegisterCommands<UWUCommands>();
+            _commands = _client.UseCommandsNext(commandsConfig);
+            _commands.RegisterCommands<MVPCommands>();
+            _commands.RegisterCommands<UWUCommands>();
 
-            await Client.ConnectAsync();
+            await _client.ConnectAsync();
 
             await Task.Delay(-1);
         }
 
-        private Task OnClientReady(ReadyEventArgs e)
+        private Task OnClientReady(DiscordClient client, ReadyEventArgs e)
         {
             return Task.CompletedTask;
         }
+
     }
 }
