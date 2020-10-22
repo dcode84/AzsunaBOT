@@ -16,7 +16,7 @@ namespace AzsunaBOT.Helpers
         /// </summary>
 
 
-        public const int EarlyReminderInMinutes = 1;
+        public const int EarlyReminderInMinutes = 5;
 
         private static Timer _mvpTimer;
         private CommandContext _context;
@@ -26,6 +26,7 @@ namespace AzsunaBOT.Helpers
 
         private readonly TimeSpan _minVarianceTime;
         private readonly TimeSpan _maxVarianceTime;
+        private TimeSpan _timeUntilVariance;
 
         private bool _earlyReminderFlag = false;
         private bool _varianceFlag = false;
@@ -51,11 +52,22 @@ namespace AzsunaBOT.Helpers
                 }
             }
         }
-        public string Name { get => _name; set => _name = value; }
+        public string Name { get => _name; }
         public bool IsRunning { get; private set; }
-        public DateTime? KillTime { get => _killTime; set => _killTime = value; }
-        public DateTime VarianceStart { get => _varianceStart; set => _varianceStart = value; }
-        public bool IsInVariance { get => _isInVariance; set => _isInVariance = value; }
+        public bool IsInVariance { get => _isInVariance; }
+
+        public DateTime? KillTime { get => _killTime; }
+        public DateTime VarianceStart { get => _varianceStart; }
+
+        public TimeSpan TimeUntilVariance
+        {
+            get { return _timeUntilVariance; }
+            set
+            {
+
+                _timeUntilVariance = DateTime.UtcNow.Subtract(_varianceStart);
+            }
+        }
 
         public delegate void TimerEventHandler(object sender, TimerEventArgs args);
         public event TimerEventHandler TimeReached;

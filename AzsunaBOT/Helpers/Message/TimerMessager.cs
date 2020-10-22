@@ -58,10 +58,24 @@ namespace AzsunaBOT.Helpers.Message
         {
             foreach (var mvp in MVPTimerList._list)
             {
-                await context.Channel.SendMessageAsync($"**{mvp.Name}** : " +
-                                                        $"**Killed** : {mvp.KillTime.Value:HH:mm:ss} " +
-                                                        $"**Variance** : {mvp.VarianceStart:HH:mm:ss} " +
-                                                        $"**InVariance** : {mvp.IsInVariance}");
+                await context.Channel.SendMessageAsync($"**{mvp.Name}** : \n" +
+                                                       $"      **Killed** : {mvp.KillTime.Value:HH:mm:ss} \n" +
+                                                       $"      **Variance** : {mvp.VarianceStart:HH:mm:ss} \n" +
+                                                       $"      **InVariance** : {mvp.IsInVariance}");
+            }
+        }
+
+        public static async Task<DiscordMessage> DisplayVarianceInfo(CommandContext context, MVPTimer timer)
+        {
+            if (timer.IsInVariance == false)
+            {
+                return await context.Channel.SendMessageAsync($"**{timer.Name}** : \n" +
+                                                              $"       **Variance time** : {timer.VarianceStart:HH:mm:ss} \n" +
+                                                              $"       **Time left** : {timer.TimeUntilVariance.Hours}:{timer.TimeUntilVariance.Minutes}:{timer.TimeUntilVariance.Seconds}");
+            }
+            else
+            {
+                return await context.Channel.SendMessageAsync($"**{timer.Name}** : MVP is in variance already!");
             }
         }
     }

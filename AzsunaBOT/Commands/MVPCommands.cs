@@ -15,7 +15,6 @@ namespace AzsunaBOT.Commands
     public class MVPCommands : BaseCommandModule
     {
         private List<MVPData> _mvpDataList = new List<MVPData>();
-        private List<MVPTimer> _timerList = new List<MVPTimer>();
 
         private MVPTimer _timer;
 
@@ -75,6 +74,7 @@ namespace AzsunaBOT.Commands
                     break;
 
                 case "v":
+                    await TimerMessager.DisplayVarianceInfo(context, _timer);
                     break;
 
                 case "t":
