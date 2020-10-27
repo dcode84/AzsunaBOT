@@ -7,14 +7,24 @@
 
   <ItemGroup>
     <None Include="..\.editorconfig" Link=".editorconfig" />
+    <None Include="bin\Debug\netcoreapp3.1\appsettings.json" />
     <None Include="bin\Debug\netcoreapp3.1\MVPData.json" />
     <None Include="bin\Release\netcoreapp3.1\MVPData.json" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="BouncyCastle.NetCore" Version="1.8.8" />
     <PackageReference Include="DSharpPlus" Version="4.0.0-nightly-00738" />
     <PackageReference Include="DSharpPlus.CommandsNext" Version="4.0.0-nightly-00738" />
     <PackageReference Include="DSharpPlus.Interactivity" Version="4.0.0-nightly-00738" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="5.0.0-rc.2.20475.5" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="5.0.0-rc.2.20475.5" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0-rc.2.20475.5" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="5.0.0-rc.2.20475.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DataLibrary\DataLibrary.csproj" />
   </ItemGroup>
 
 </Project>

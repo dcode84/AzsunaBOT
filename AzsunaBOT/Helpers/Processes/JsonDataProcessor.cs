@@ -1,4 +1,4 @@
-﻿using AzsunaBOT.Data;
+﻿using AzsunaBOT.Models;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
@@ -28,6 +28,14 @@ namespace AzsunaBOT.Helpers.Processes
             var mvpObject = Task.Run(() => JsonConvert.DeserializeObject<List<MVPData>>(_jsonString));
 
             return mvpObject.Result;
+        }
+
+        public static async Task<ConfigJson> DeserializeConfigDataAsync(string path)
+        {
+            await ReadDataFromJsonAsync(path);
+            var configObject = Task.Run(() => JsonConvert.DeserializeObject<ConfigJson>(_jsonString));
+
+            return configObject.Result;
         }
     }
 }

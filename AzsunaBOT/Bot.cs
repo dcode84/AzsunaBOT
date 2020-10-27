@@ -1,11 +1,14 @@
 ﻿using AzsunaBOT.Commands;
 using AzsunaBOT.Helpers.Message;
+using AzsunaBOT.Helpers.Processes;
+using DataLibrary.DataAccess;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.EventArgs;
-using Newtonsoft.Json;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace AzsunaBOT
@@ -14,23 +17,22 @@ namespace AzsunaBOT
     {
         private DiscordClient _client { get; set; }
         private CommandsNextExtension _commands { get; set; }
+        private ConfigJson _botConfig { get; set; }
+
+        public static IConfiguration _configuration;
 
         public async Task RunAsync()
         {
-            var json = string.Empty;
-
-            using (var fs = File.OpenRead("config.json"))
-            using (var sr = new StreamReader(fs, new UTF8Encoding(false)))
-                json = await sr.ReadToEndAsync().ConfigureAwait(false);
-
-            var configJson = JsonConvert.DeserializeObject<ConfigJson>(json);
+            try { _botConfig = JsonDataProcessor.DeserializeConfigDataAsync("config.json").Result; }
+            catch (Exception e) { Console.WriteLine(e.Message); }
 
             var config = new DiscordConfiguration
             {
-                Token = configJson.Token,
+                Token = _botConfig.Token,
                 TokenType = TokenType.Bot,
                 AutoReconnect = true,
                 MinimumLogLevel = Microsoft.Extensions.Logging.LogLevel.Debug
+
             };
 
             _client = new DiscordClient(config);
@@ -40,14 +42,16 @@ namespace AzsunaBOT
 
             var commandsConfig = new CommandsNextConfiguration()
             {
-                StringPrefixes = new string[] { configJson.Prefix },
+                StringPrefixes = new string[] { _botConfig.Prefix },
                 EnableDms = false,
                 EnableMentionPrefix = true,
-                DmHelp = true
+                DmHelp = true,
+                Services = ConfigureServices()
             };
 
             _commands = _client.UseCommandsNext(commandsConfig);
             _commands.RegisterCommands<MVPCommands>();
+            _commands.RegisterCommands<AttendanceCommands>();
             _commands.RegisterCommands<UWUCommands>();
 
             await _client.ConnectAsync();
@@ -58,6 +62,20 @@ namespace AzsunaBOT
         private Task OnClientReady(DiscordClient client, ReadyEventArgs e)
         {
             return Task.CompletedTask;
+        }
+
+        public IServiceProvider ConfigureServices()
+        {
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", true, true);
+            _configuration = builder.Build();
+
+            var services = new ServiceCollection();
+
+            return services.AddSingleton<IDataAccess, DataAccess>()
+                .AddSingleton(_configuration)
+                .BuildServiceProvider();
         }
 
     }
