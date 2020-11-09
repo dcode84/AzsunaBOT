@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "AzsunaBOT": {
+      "commandName": "Project",
+      "nativeDebugging": false
+    }
+  }
+}

@@ -20,6 +20,13 @@ namespace AzsunaBOT
         private ConfigJson _botConfig { get; set; }
 
         public static IConfiguration _configuration;
+        private readonly IServiceProvider _serviceProvider;
+
+        public Bot(IConfiguration configuration, IServiceProvider serviceProvider)
+        {
+            _configuration = configuration;
+            _serviceProvider = serviceProvider;
+        }
 
         public async Task RunAsync()
         {
@@ -46,7 +53,7 @@ namespace AzsunaBOT
                 EnableDms = false,
                 EnableMentionPrefix = true,
                 DmHelp = true,
-                Services = ConfigureServices()
+                Services = _serviceProvider
             };
 
             _commands = _client.UseCommandsNext(commandsConfig);
@@ -64,16 +71,15 @@ namespace AzsunaBOT
             return Task.CompletedTask;
         }
 
-        public IServiceProvider ConfigureServices()
+        public void ConfigureServices(IServiceCollection services)
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", true, true);
             _configuration = builder.Build();
 
-            var services = new ServiceCollection();
 
-            return services.AddSingleton<IDataAccess, DataAccess>()
+            services.AddSingleton<IDataAccess, DataAccess>()
                 .AddSingleton(_configuration)
                 .BuildServiceProvider();
         }

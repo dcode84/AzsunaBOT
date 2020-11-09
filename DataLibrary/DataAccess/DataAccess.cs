@@ -1,38 +1,33 @@
 ﻿using Dapper;
+using MySql.Data;
 using MySql.Data.MySqlClient;
-using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DataLibrary.DataAccess
 {
     public class DataAccess : IDataAccess
     {
-        public string GetConnectionString(string connectionName = "AzsunaBOT")
+        public async Task<List<T>> LoadData<T, U>(string storedProcedure, U parameters, string connectionString)
         {
-            return ConfigurationManager.ConnectionStrings[connectionName].ConnectionString;
-        }
-
-        public async Task<List<T>> LoadData<T, U>(string sql, U parameters)
-        {
-            using (IDbConnection connection = new MySqlConnection(GetConnectionString()))
+            using (IDbConnection connection = new MySqlConnection(connectionString))
             {
-                IEnumerable<T> rows = await connection.QueryAsync<T>(sql, parameters);
+                var rows = await connection.QueryAsync<T>(storedProcedure, parameters, commandType: CommandType.StoredProcedure);
 
                 return rows.ToList();
             }
         }
 
-        public Task SaveData<T>(string sql, T parameters)
+        public Task SaveData<T>(string storedProcedure, T parameters, string connectionString)
         {
-            using (IDbConnection connection = new MySqlConnection(GetConnectionString()))
+            using (IDbConnection connection = new MySqlConnection(connectionString))
             {
-                return connection.ExecuteAsync(sql, parameters);
+                return connection.ExecuteAsync(storedProcedure, parameters, commandType: CommandType.StoredProcedure);
             }
         }
+
     }
 }

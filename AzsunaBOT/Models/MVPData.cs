@@ -1,5 +1,5 @@
 ﻿
-namespace AzsunaBOT.Data
+namespace AzsunaBOT.Models
 {
     public class MVPData
     {

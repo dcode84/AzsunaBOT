@@ -2,6 +2,7 @@
 using AzsunaBOT.Helpers;
 using AzsunaBOT.Helpers.Message;
 using AzsunaBOT.Helpers.Processes;
+using AzsunaBOT.Models;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using System;

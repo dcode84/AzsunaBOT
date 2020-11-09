@@ -1,0 +1,35 @@
+﻿namespace AzsunaBOT.Enums
+{
+    public enum Roles
+    {
+        RECALLER,
+        FSPROF,
+        DDCHEM,
+        DEVO,
+        HP,
+        DLP,
+        SPPCHEM,
+        LINKER,
+        CHAMP,
+        TAROTGYPSY,
+        TAROTCLOWN,
+        FSCLOWN,
+        SCREAM,
+        DDSNIPER,
+        FASNIPER,
+        FJCLOWN,
+        DDHW,
+        FSHW,
+        DDSTALKER,
+        MBKDEVO,
+        MBKPROF,
+        SGGYPSY,
+        FSSMITH,
+        MBKRECALLER,
+        SPSONG,
+        WARPER,
+        STATUSSNIPER,
+        GUEST,
+        REROLL
+    }
+}
