@@ -9,6 +9,7 @@
     <None Include="..\.editorconfig" Link=".editorconfig" />
     <None Include="bin\Debug\netcoreapp3.1\appsettings.json" />
     <None Include="bin\Debug\netcoreapp3.1\MVPData.json" />
+    <None Include="bin\Debug\netcoreapp3.1\rosterChannels.json" />
     <None Include="bin\Release\netcoreapp3.1\MVPData.json" />
   </ItemGroup>
 

@@ -41,7 +41,6 @@ namespace AzsunaBOT.Helpers.Message
             return builder;
         }
 
-
         public static async Task<StringBuilder> BuildThirdPostAsync(List<AttendanceModel> list)
         {
             var builder = new StringBuilder();
@@ -62,7 +61,6 @@ namespace AzsunaBOT.Helpers.Message
             return builder;
         }
 
-
         private static async Task<string> GetSignColorAsync(AttendanceModel entry)
         {
             string cache = "";
@@ -82,14 +80,23 @@ namespace AzsunaBOT.Helpers.Message
             return cache;
         }
 
+        //private static async Task BuildRosterStrings(List<AttendanceModel> list)
+        //{
+        //    foreach (var entry in list)
+        //    {
+
+        //    }
+        //}
+
+
         #region BuildFirstBatch
         private static async Task BuildSupportGypsy(List<AttendanceModel> list, StringBuilder builder)
         {
             if (list.Any(x => x.Role.ToUpper() == "SPSONG"))
             {
                 builder.AppendLine("**SPSONG**");
-                foreach (var role in list.Where(x => x.Role == "SPSONG"))
-                    builder.AppendLine($"{await GetSignColorAsync(role)} @{role.DiscordTag} - {role.CharName} : {role.Comments}");
+                foreach (var entry in list.Where(x => x.Role == "SPSONG"))
+                    builder.AppendLine($"{await GetSignColorAsync(entry)} {entry.DiscordTag} - {entry.CharName}     {entry.Comments}");
             }
 
         }
@@ -99,8 +106,8 @@ namespace AzsunaBOT.Helpers.Message
             if (list.Any(x => x.Role.ToUpper() == "SCREAM"))
             {
                 builder.AppendLine("**SCREAM**");
-                foreach (var role in list.Where(x => x.Role == "SCREAM"))
-                    builder.AppendLine($"{await GetSignColorAsync(role)} @{role.DiscordTag} - {role.CharName} : {role.Comments}");
+                foreach (var entry in list.Where(x => x.Role == "SCREAM"))
+                    builder.AppendLine($"{await GetSignColorAsync(entry)} {entry.DiscordTag} - {entry.CharName}     {entry.Comments}");
             }
         }
 
@@ -109,8 +116,8 @@ namespace AzsunaBOT.Helpers.Message
             if (list.Any(x => x.Role.ToUpper() == "DEVO"))
             {
                 builder.AppendLine("**DEVO**");
-                foreach (var role in list.Where(x => x.Role == "DEVO"))
-                    builder.AppendLine($"{await GetSignColorAsync(role)} @{role.DiscordTag} - { role.CharName} : { role.Comments}");
+                foreach (var entry in list.Where(x => x.Role == "DEVO"))
+                    builder.AppendLine($"{await GetSignColorAsync(entry)} {entry.DiscordTag} - {entry.CharName}     {entry.Comments}");
             }
         }
 
@@ -119,8 +126,8 @@ namespace AzsunaBOT.Helpers.Message
             if (list.Any(x => x.Role.ToUpper() == "FSCLOWN"))
             {
                 builder.AppendLine("**FSCLOWN**");
-                foreach (var role in list.Where(x => x.Role == "FSCLOWN"))
-                    builder.AppendLine($"{await GetSignColorAsync(role)} @{role.DiscordTag} - {role.CharName} : {role.Comments}");
+                foreach (var entry in list.Where(x => x.Role == "FSCLOWN"))
+                    builder.AppendLine($"{await GetSignColorAsync(entry)} {entry.DiscordTag} - {entry.CharName}     {entry.Comments}");
             }
         }
 
@@ -129,8 +136,8 @@ namespace AzsunaBOT.Helpers.Message
             if (list.Any(x => x.Role.ToUpper() == "SPPCHEM"))
             {
                 builder.AppendLine("**SPPCHEM**");
-                foreach (var role in list.Where(x => x.Role == "SPPCHEM"))
-                    builder.AppendLine($"{await GetSignColorAsync(role)} @{role.DiscordTag} - {role.CharName} : {role.Comments}");
+                foreach (var entry in list.Where(x => x.Role == "SPPCHEM"))
+                    builder.AppendLine($"{await GetSignColorAsync(entry)} {entry.DiscordTag} - {entry.CharName}     {entry.Comments}");
             }
         }
 
@@ -139,8 +146,8 @@ namespace AzsunaBOT.Helpers.Message
             if (list.Any(x => x.Role.ToUpper() == "DDCHEM"))
             {
                 builder.AppendLine("**DDCHEM**");
-                foreach (var role in list.Where(x => x.Role == "DDCHEM"))
-                    builder.AppendLine($"{await GetSignColorAsync(role)} @{role.DiscordTag} - {role.CharName} : {role.Comments}");
+                foreach (var entry in list.Where(x => x.Role == "DDCHEM"))
+                    builder.AppendLine($"{await GetSignColorAsync(entry)} {entry.DiscordTag} - {entry.CharName}     {entry.Comments}");
             }
         }
 
@@ -149,8 +156,8 @@ namespace AzsunaBOT.Helpers.Message
             if (list.Any(x => x.Role.ToUpper() == "DLP"))
             {
                 builder.AppendLine("**DLP**");
-                foreach (var role in list.Where(x => x.Role == "DLP"))
-                    builder.AppendLine($"{await GetSignColorAsync(role)} @{role.DiscordTag} - {role.CharName} : {role.Comments}");
+                foreach (var entry in list.Where(x => x.Role == "DLP"))
+                    builder.AppendLine($"{await GetSignColorAsync(entry)} {entry.DiscordTag} - {entry.CharName}     {entry.Comments}");
             }
         }
 
@@ -159,8 +166,8 @@ namespace AzsunaBOT.Helpers.Message
             if (list.Any(x => x.Role.ToUpper() == "FSPROF"))
             {
                 builder.AppendLine("**FSPROF**");
-                foreach (var role in list.Where(x => x.Role == "FSPROF"))
-                    builder.AppendLine($"{await GetSignColorAsync(role)} @{role.DiscordTag} - {role.CharName} : {role.Comments}");
+                foreach (var entry in list.Where(x => x.Role == "FSPROF"))
+                    builder.AppendLine($"{await GetSignColorAsync(entry)} {entry.DiscordTag} - {entry.CharName}     {entry.Comments}");
             }
         }
 
@@ -169,8 +176,8 @@ namespace AzsunaBOT.Helpers.Message
             if (list.Any(x => x.Role.ToUpper() == "RECALLER"))
             {
                 builder.AppendLine("**RECALLER**");
-                foreach (var role in list.Where(x => x.Role == "RECALLER"))
-                    builder.AppendLine($"{await GetSignColorAsync(role)} @{role.DiscordTag} - {role.CharName} : {role.Comments}");
+                foreach (var entry in list.Where(x => x.Role == "RECALLER"))
+                    builder.AppendLine($"{await GetSignColorAsync(entry)} {entry.DiscordTag} - {entry.CharName}     {entry.Comments}");
             }
         }
         #endregion
@@ -181,8 +188,8 @@ namespace AzsunaBOT.Helpers.Message
             if (list.Any(x => x.Role.ToUpper() == "DDHW"))
             {
                 builder.AppendLine("**DDHW**");
-                foreach (var role in list.Where(x => x.Role == "DDHW"))
-                    builder.AppendLine($"{await GetSignColorAsync(role)} @{role.DiscordTag} - {role.CharName} : {role.Comments}");
+                foreach (var entry in list.Where(x => x.Role == "DDHW"))
+                    builder.AppendLine($"{await GetSignColorAsync(entry)} {entry.DiscordTag} - {entry.CharName}     {entry.Comments}");
             }
 
         }
@@ -192,8 +199,8 @@ namespace AzsunaBOT.Helpers.Message
             if (list.Any(x => x.Role.ToUpper() == "FJCLOWN"))
             {
                 builder.AppendLine("**FJCLOWN**");
-                foreach (var role in list.Where(x => x.Role == "FJCLOWN"))
-                    builder.AppendLine($"{await GetSignColorAsync(role)} @{role.DiscordTag} - {role.CharName} : {role.Comments}");
+                foreach (var entry in list.Where(x => x.Role == "FJCLOWN"))
+                    builder.AppendLine($"{await GetSignColorAsync(entry)} {entry.DiscordTag} - {entry.CharName}     {entry.Comments}");
             }
 
         }
@@ -203,8 +210,8 @@ namespace AzsunaBOT.Helpers.Message
             if (list.Any(x => x.Role.ToUpper() == "TAROTCLOWN"))
             {
                 builder.AppendLine("**TAROTCLOWN**");
-                foreach (var role in list.Where(x => x.Role == "TAROTCLOWN"))
-                    builder.AppendLine($"{await GetSignColorAsync(role)} @{role.DiscordTag} - {role.CharName} : {role.Comments}");
+                foreach (var entry in list.Where(x => x.Role == "TAROTCLOWN"))
+                    builder.AppendLine($"{await GetSignColorAsync(entry)} {entry.DiscordTag} - {entry.CharName}     {entry.Comments}");
             }
 
         }
@@ -214,8 +221,8 @@ namespace AzsunaBOT.Helpers.Message
             if (list.Any(x => x.Role.ToUpper() == "TAROTGYPSY"))
             {
                 builder.AppendLine("**TAROTGYPSY**");
-                foreach (var role in list.Where(x => x.Role == "TAROTGYPSY"))
-                    builder.AppendLine($"{await GetSignColorAsync(role)} @{role.DiscordTag} - {role.CharName} : {role.Comments}");
+                foreach (var entry in list.Where(x => x.Role == "TAROTGYPSY"))
+                    builder.AppendLine($"{await GetSignColorAsync(entry)} {entry.DiscordTag} - {entry.CharName}     {entry.Comments}");
             }
 
         }
@@ -225,8 +232,8 @@ namespace AzsunaBOT.Helpers.Message
             if (list.Any(x => x.Role.ToUpper() == "SGGYPSY"))
             {
                 builder.AppendLine("**SGGYPSY**");
-                foreach (var role in list.Where(x => x.Role == "SGGYPSY"))
-                    builder.AppendLine($"{await GetSignColorAsync(role)} @{role.DiscordTag} - {role.CharName} : {role.Comments}");
+                foreach (var entry in list.Where(x => x.Role == "SGGYPSY"))
+                    builder.AppendLine($"{await GetSignColorAsync(entry)} {entry.DiscordTag} - {entry.CharName}     {entry.Comments}");
             }
 
         }
@@ -236,8 +243,8 @@ namespace AzsunaBOT.Helpers.Message
             if (list.Any(x => x.Role.ToUpper() == "CHAMP"))
             {
                 builder.AppendLine("**CHAMP**");
-                foreach (var role in list.Where(x => x.Role == "CHAMP"))
-                    builder.AppendLine($"{await GetSignColorAsync(role)} @{role.DiscordTag} - {role.CharName} : {role.Comments}");
+                foreach (var entry in list.Where(x => x.Role == "CHAMP"))
+                    builder.AppendLine($"{await GetSignColorAsync(entry)} {entry.DiscordTag} - {entry.CharName}     {entry.Comments}");
             }
         }
 
@@ -246,8 +253,8 @@ namespace AzsunaBOT.Helpers.Message
             if (list.Any(x => x.Role.ToUpper() == "LINKER"))
             {
                 builder.AppendLine("**LINKER**");
-                foreach (var role in list.Where(x => x.Role == "LINKER"))
-                    builder.AppendLine($"{await GetSignColorAsync(role)} @{role.DiscordTag} - {role.CharName} : {role.Comments}");
+                foreach (var entry in list.Where(x => x.Role == "LINKER"))
+                    builder.AppendLine($"{await GetSignColorAsync(entry)} {entry.DiscordTag} - {entry.CharName}     {entry.Comments}");
             }
         }
 
@@ -256,8 +263,8 @@ namespace AzsunaBOT.Helpers.Message
             if (list.Any(x => x.Role.ToUpper() == "HP"))
             {
                 builder.AppendLine("**HP**");
-                foreach (var role in list.Where(x => x.Role == "HP"))
-                    builder.AppendLine($"{await GetSignColorAsync(role)} @{role.DiscordTag} - {role.CharName} : {role.Comments}");
+                foreach (var entry in list.Where(x => x.Role == "HP"))
+                    builder.AppendLine($"{await GetSignColorAsync(entry)} {entry.DiscordTag} - {entry.CharName}     {entry.Comments}");
             }
         }
         #endregion
@@ -268,8 +275,8 @@ namespace AzsunaBOT.Helpers.Message
             if (list.Any(x => x.Role.ToUpper() == "GUEST"))
             {
                 builder.AppendLine("**GUEST**");
-                foreach (var role in list.Where(x => x.Role == "GUEST"))
-                    builder.AppendLine($"{await GetSignColorAsync(role)} @{role.DiscordTag} - {role.CharName} : {role.Comments}");
+                foreach (var entry in list.Where(x => x.Role == "GUEST"))
+                    builder.AppendLine($"{await GetSignColorAsync(entry)} {entry.DiscordTag} - {entry.CharName}     {entry.Comments}");
             }
         }
 
@@ -278,8 +285,8 @@ namespace AzsunaBOT.Helpers.Message
             if (list.Any(x => x.Role.ToUpper() == "REROLL"))
             {
                 builder.AppendLine("**REROLL**");
-                foreach (var role in list.Where(x => x.Role == "REROLL"))
-                    builder.AppendLine($"{await GetSignColorAsync(role)} @{role.DiscordTag} - {role.CharName} : {role.Comments}");
+                foreach (var entry in list.Where(x => x.Role == "REROLL"))
+                    builder.AppendLine($"{await GetSignColorAsync(entry)} {entry.DiscordTag} - {entry.CharName}     {entry.Comments}");
             }
         }
 
@@ -288,8 +295,8 @@ namespace AzsunaBOT.Helpers.Message
             if (list.Any(x => x.Role.ToUpper() == "WARPER"))
             {
                 builder.AppendLine("**WARPER**");
-                foreach (var role in list.Where(x => x.Role == "WARPER"))
-                    builder.AppendLine($"{await GetSignColorAsync(role)} @{role.DiscordTag} - {role.CharName} : {role.Comments}");
+                foreach (var entry in list.Where(x => x.Role == "WARPER"))
+                    builder.AppendLine($"{await GetSignColorAsync(entry)} {entry.DiscordTag} - {entry.CharName}     {entry.Comments}");
             }
         }
 
@@ -298,8 +305,8 @@ namespace AzsunaBOT.Helpers.Message
             if (list.Any(x => x.Role.ToUpper() == "FSSMITH"))
             {
                 builder.AppendLine("**FSSMITH**");
-                foreach (var role in list.Where(x => x.Role == "FSSMITH"))
-                    builder.AppendLine($"{await GetSignColorAsync(role)} @{role.DiscordTag} - {role.CharName} : {role.Comments}");
+                foreach (var entry in list.Where(x => x.Role == "FSSMITH"))
+                    builder.AppendLine($"{await GetSignColorAsync(entry)} {entry.DiscordTag} - {entry.CharName}     {entry.Comments}");
             }
         }
 
@@ -308,8 +315,8 @@ namespace AzsunaBOT.Helpers.Message
             if (list.Any(x => x.Role.ToUpper() == "SMITH"))
             {
                 builder.AppendLine("**SMITH**");
-                foreach (var role in list.Where(x => x.Role == "SMITH"))
-                    builder.AppendLine($"{await GetSignColorAsync(role)} @{role.DiscordTag} - {role.CharName} : {role.Comments}");
+                foreach (var entry in list.Where(x => x.Role == "SMITH"))
+                    builder.AppendLine($"{await GetSignColorAsync(entry)} {entry.DiscordTag} - {entry.CharName}     {entry.Comments}");
             }
         }
 
@@ -318,8 +325,8 @@ namespace AzsunaBOT.Helpers.Message
             if (list.Any(x => x.Role.ToUpper() == "MBKDEVO"))
             {
                 builder.AppendLine("**MBKDEVO**");
-                foreach (var role in list.Where(x => x.Role == "MBKDEVO"))
-                    builder.AppendLine($"{await GetSignColorAsync(role)} @{role.DiscordTag} - {role.CharName} : {role.Comments}");
+                foreach (var entry in list.Where(x => x.Role == "MBKDEVO"))
+                    builder.AppendLine($"{await GetSignColorAsync(entry)} {entry.DiscordTag} - {entry.CharName}     {entry.Comments}");
             }
         }
 
@@ -328,8 +335,8 @@ namespace AzsunaBOT.Helpers.Message
             if (list.Any(x => x.Role.ToUpper() == "MBKPROF"))
             {
                 builder.AppendLine("**MBKPROF**");
-                foreach (var role in list.Where(x => x.Role == "MBKPROF"))
-                    builder.AppendLine($"{await GetSignColorAsync(role)} @{role.DiscordTag} - {role.CharName} : {role.Comments}");
+                foreach (var entry in list.Where(x => x.Role == "MBKPROF"))
+                    builder.AppendLine($"{await GetSignColorAsync(entry)} {entry.DiscordTag} - {entry.CharName}     {entry.Comments}");
             }
         }
 
@@ -338,8 +345,8 @@ namespace AzsunaBOT.Helpers.Message
             if (list.Any(x => x.Role.ToUpper() == "MBKRECALLER"))
             {
                 builder.AppendLine("**MBKRECALLER**");
-                foreach (var role in list.Where(x => x.Role == "MBKRECALLER"))
-                    builder.AppendLine($"{await GetSignColorAsync(role)} @{role.DiscordTag} - {role.CharName} : {role.Comments}");
+                foreach (var entry in list.Where(x => x.Role == "MBKRECALLER"))
+                    builder.AppendLine($"{await GetSignColorAsync(entry)} {entry.DiscordTag} - {entry.CharName}     {entry.Comments}");
             }
         }
 
@@ -348,8 +355,8 @@ namespace AzsunaBOT.Helpers.Message
             if (list.Any(x => x.Role.ToUpper() == "STATUSSNIPER"))
             {
                 builder.AppendLine("**STATUSSNIPER**");
-                foreach (var role in list.Where(x => x.Role == "STATUSSNIPER"))
-                    builder.AppendLine($"{await GetSignColorAsync(role)} @{role.DiscordTag} - {role.CharName} : {role.Comments}");
+                foreach (var entry in list.Where(x => x.Role == "STATUSSNIPER"))
+                    builder.AppendLine($"{await GetSignColorAsync(entry)} {entry.DiscordTag} - {entry.CharName}     {entry.Comments}");
             }
         }
 
@@ -358,8 +365,8 @@ namespace AzsunaBOT.Helpers.Message
             if (list.Any(x => x.Role.ToUpper() == "DDSNIPER"))
             {
                 builder.AppendLine("**DDSNIPER**");
-                foreach (var role in list.Where(x => x.Role == "DDSNIPER"))
-                    builder.AppendLine($"{await GetSignColorAsync(role)} @{role.DiscordTag} - {role.CharName} : {role.Comments}");
+                foreach (var entry in list.Where(x => x.Role == "DDSNIPER"))
+                    builder.AppendLine($"{await GetSignColorAsync(entry)} {entry.DiscordTag} - {entry.CharName}     {entry.Comments}");
             }
         }
 
@@ -368,8 +375,8 @@ namespace AzsunaBOT.Helpers.Message
             if (list.Any(x => x.Role.ToUpper() == "DDSTALKER"))
             {
                 builder.AppendLine("**DDSTALKER**");
-                foreach (var role in list.Where(x => x.Role == "DDSTALKER"))
-                    builder.AppendLine($"{await GetSignColorAsync(role)} @{role.DiscordTag} - {role.CharName} : {role.Comments}");
+                foreach (var entry in list.Where(x => x.Role == "DDSTALKER"))
+                    builder.AppendLine($"{await GetSignColorAsync(entry)} {entry.DiscordTag} - {entry.CharName}     {entry.Comments}");
             }
         }
 
@@ -378,8 +385,8 @@ namespace AzsunaBOT.Helpers.Message
             if (list.Any(x => x.Role.ToUpper() == "FSHW"))
             {
                 builder.AppendLine("**FSHW**");
-                foreach (var role in list.Where(x => x.Role == "FSHW"))
-                    builder.AppendLine($"{await GetSignColorAsync(role)} @{role.DiscordTag} - {role.CharName} : {role.Comments}");
+                foreach (var entry in list.Where(x => x.Role == "FSHW"))
+                    builder.AppendLine($"{await GetSignColorAsync(entry)} {entry.DiscordTag} - {entry.CharName}     {entry.Comments}");
             }
         }
         #endregion

@@ -10,46 +10,62 @@ namespace AzsunaBOT.Helpers.Processes
 {
     public static class RoleProcessor
     {
-        public static async Task<List<AttendanceModel>> SortFirstBatchAsync(List<AttendanceModel> list)
+        public static async Task SortAllAsync(List<AttendanceModel> list)
         {
-            foreach (var item in list)
-            {
-                if (Enum.IsDefined(typeof(FirstPostRoles), item.Role.ToUpper()))
-                {
-                    RoleLists.FirstBatch.Add(item);
-                }
-            }
-            var sorted = RoleLists.FirstBatch.OrderByDescending(x => x.Role).ThenByDescending(x => x.Sign).ToList();
-
-            return sorted;
+            await SortFirstBatchAsync(list);
+            await SortSecondBatchAsync(list);
+            await SortThirdBatchAsync(list);
         }
 
-        public static async Task<List<AttendanceModel>> SortSecondBatchAsync(List<AttendanceModel> list)
+        private static async Task<List<AttendanceModel>> SortFirstBatchAsync(List<AttendanceModel> list)
         {
-            foreach (var item in list)
+            return await Task.Run(() =>
             {
-                if (Enum.IsDefined(typeof(SecondPostRoles), item.Role.ToUpper()))
+                foreach (var item in list)
                 {
-                    RoleLists.SecondBatch.Add(item);
+                    if (Enum.IsDefined(typeof(FirstPostRoles), item.Role.ToUpper()))
+                    {
+                        RoleLists.FirstBatch.Add(item);
+                    }
                 }
-            }
-            var sorted = RoleLists.SecondBatch.OrderByDescending(x => x.Role).ThenByDescending(x => x.Sign).ToList();
+                var sorted = RoleLists.FirstBatch.OrderByDescending(x => x.Role).ThenByDescending(x => x.Sign).ToList();
 
-            return sorted;
+                return sorted;
+            });
         }
 
-        public static async Task<List<AttendanceModel>> SortThirdBatchAsync(List<AttendanceModel> list)
+        private static async Task<List<AttendanceModel>> SortSecondBatchAsync(List<AttendanceModel> list)
         {
-            foreach (var item in list)
+            return await Task.Run(() =>
             {
-                if (Enum.IsDefined(typeof(ThirdPostRoles), item.Role.ToUpper()))
+                foreach (var item in list)
                 {
-                    RoleLists.ThirdBatch.Add(item);
+                    if (Enum.IsDefined(typeof(SecondPostRoles), item.Role.ToUpper()))
+                    {
+                        RoleLists.SecondBatch.Add(item);
+                    }
                 }
-            }
-            var sorted = RoleLists.ThirdBatch.OrderByDescending(x => x.Role).ThenByDescending(x => x.Sign).ToList();
+                var sorted = RoleLists.SecondBatch.OrderByDescending(x => x.Role).ThenByDescending(x => x.Sign).ToList();
 
-            return sorted;
+                return sorted;
+            });
+        }
+
+        private static async Task<List<AttendanceModel>> SortThirdBatchAsync(List<AttendanceModel> list)
+        {
+            return await Task.Run(() =>
+            {
+                foreach (var item in list)
+                {
+                    if (Enum.IsDefined(typeof(ThirdPostRoles), item.Role.ToUpper()))
+                    {
+                        RoleLists.ThirdBatch.Add(item);
+                    }
+                }
+                var sorted = RoleLists.ThirdBatch.OrderByDescending(x => x.Role).ThenByDescending(x => x.Sign).ToList();
+
+                return sorted;
+            });
         }
     }
 }

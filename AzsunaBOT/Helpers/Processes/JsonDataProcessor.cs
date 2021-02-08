@@ -37,5 +37,13 @@ namespace AzsunaBOT.Helpers.Processes
 
             return configObject.Result;
         }
+
+        public static async Task<List<ChannelModel>> DeserializeChannelDataAsync(string path)
+        {
+            await ReadDataFromJsonAsync(path);
+            var channelObject = Task.Run(() => JsonConvert.DeserializeObject<List<ChannelModel>>(_jsonString));
+
+            return channelObject.Result;
+        }
     }
 }

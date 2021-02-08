@@ -26,5 +26,9 @@ namespace AzsunaBOT.Helpers.Message
         {
             return await context.Channel.SendMessageAsync($"You have signed up already. Try a different command.");
         }
+        public static async Task<DiscordMessage> IncorrectDayMessage(CommandContext context)
+        {
+            return await context.Channel.SendMessageAsync($"This is not a valid day. Try one of **mon, tue, wed, thu, fri, sat, sun**");
+        }
     }
 }

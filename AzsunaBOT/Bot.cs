@@ -1,4 +1,5 @@
 ﻿using AzsunaBOT.Commands;
+using AzsunaBOT.Helpers;
 using AzsunaBOT.Helpers.Message;
 using AzsunaBOT.Helpers.Processes;
 using DataLibrary.DataAccess;
@@ -15,7 +16,7 @@ namespace AzsunaBOT
 {
     public class Bot
     {
-        private DiscordClient _client { get; set; }
+        public static DiscordClient Client { get; set; }
         private CommandsNextExtension _commands { get; set; }
         private ConfigJson _botConfig { get; set; }
 
@@ -42,10 +43,10 @@ namespace AzsunaBOT
 
             };
 
-            _client = new DiscordClient(config);
+            Client = new DiscordClient(config);
 
-            _client.Ready += OnClientReady;
-            _client.MessageCreated += MessageListener.OnMessageSent;
+            Client.Ready += OnClientReady;
+            Client.MessageCreated += MessageListener.OnMessageSent;
 
             var commandsConfig = new CommandsNextConfiguration()
             {
@@ -56,12 +57,15 @@ namespace AzsunaBOT
                 Services = _serviceProvider
             };
 
-            _commands = _client.UseCommandsNext(commandsConfig);
+            _commands = Client.UseCommandsNext(commandsConfig);
             _commands.RegisterCommands<MVPCommands>();
-            _commands.RegisterCommands<AttendanceCommands>();
+            _commands.RegisterCommands<UserAttendanceCommands>();
+            _commands.RegisterCommands<AdminAttendanceCommands>();
             _commands.RegisterCommands<UWUCommands>();
 
-            await _client.ConnectAsync();
+            RosterHelper.DiscordClient = Client;
+
+            await Client.ConnectAsync();
 
             await Task.Delay(-1);
         }
