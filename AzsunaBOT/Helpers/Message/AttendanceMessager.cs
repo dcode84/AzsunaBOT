@@ -14,7 +14,12 @@ namespace AzsunaBOT.Helpers.Message
 
         public static async Task<DiscordMessage> IncorrectRoleMessage(CommandContext context)
         {
-            return await context.Channel.SendMessageAsync($"Incorrect role. if unsure, please see the the list with valid roles.");
+            return await context.Channel.SendMessageAsync($"Incorrect role. if unsure, please see the list with valid roles.");
+        }
+
+        internal static async Task<DiscordMessage> IncorrectWoeModeMessage(CommandContext context)
+        {
+            return await context.Channel.SendMessageAsync($"Incorrect mode. if unsure, please see the list with valid modes.");
         }
 
         public static async Task<DiscordMessage> IncorrectSignMessage(CommandContext context)
@@ -30,5 +35,20 @@ namespace AzsunaBOT.Helpers.Message
         {
             return await context.Channel.SendMessageAsync($"This is not a valid day. Try one of **mon, tue, wed, thu, fri, sat, sun**");
         }
+
+        public static async Task<DiscordMessage> SignUpBlocked(CommandContext context, string day, string mode)
+        {
+            var cache = DateFormatter.ConvertWeekDay(day).Result;
+
+            return await context.Channel.SendMessageAsync($"Signup is currently closed for **{mode.ToUpper()}** on **{cache}**");
+        }
+
+        public static async Task<DiscordMessage> NotFound(CommandContext context, string day)
+        {
+            var cache = DateFormatter.ConvertWeekDay(day).Result;
+
+            return await context.Channel.SendMessageAsync($"No signup found for **{cache}**");
+        }
+
     }
 }

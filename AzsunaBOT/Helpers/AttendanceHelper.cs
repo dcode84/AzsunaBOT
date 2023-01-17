@@ -1,25 +1,40 @@
-﻿namespace AzsunaBOT.Helpers
+﻿using AzsunaBOT.Enums;
+using AzsunaBOT.Helpers.Message;
+using DSharpPlus.CommandsNext;
+using System;
+using System.Threading.Tasks;
+
+namespace AzsunaBOT.Helpers
 {
     public static class AttendanceHelper
     {
-        //private static List<AttendanceModel> _attendanceList;
-
-
-
-        //public static async void RefreshRoster(CommandContext context, IDataAccess _data, IConfiguration _config)
-        //{
-        //    try
-        //    {
-        //        await RoleLists.ClearLists();
-
-        //        _attendanceList = _data.LoadData<AttendanceModel, dynamic>("sp_adminLookUp", new { @tblName = CurrentWoeDate }, _config.GetConnectionString("AzsunaBOT")).Result;
-
-        //        await RosterMessager.FirstRoleMessage(context, await RoleProcessor.SortFirstBatchAsync(_attendanceList));
-        //        await RosterMessager.SecondRoleMessage(context, await RoleProcessor.SortSecondBatchAsync(_attendanceList));
-        //        await RosterMessager.ThirdRoleMessage(context, await RoleProcessor.SortThirdBatchAsync(_attendanceList));
-
-        //    }
-        //    catch (Exception e) { Console.WriteLine(e.Message); }
-        //}
+        public static async Task<bool> IsValueOfEnum(CommandContext context, string day, string mode, string role, string sign)
+        {
+            return await Task.Run(async () =>
+            {
+                if (!Enum.IsDefined(typeof(WoedaysShort), day.ToUpper()))
+                {
+                    await AttendanceMessager.IncorrectDayMessage(context);
+                    return false;
+                }
+                else if (!Enum.IsDefined(typeof(WoeMode), mode.ToUpper()))
+                {
+                    await AttendanceMessager.IncorrectWoeModeMessage(context);
+                    return false;
+                }
+                else if (!Enum.IsDefined(typeof(RolesAll), role.ToUpper()))
+                {
+                    await AttendanceMessager.IncorrectRoleMessage(context);
+                    return false;
+                }
+                else if (!Enum.IsDefined(typeof(Signs), sign.ToUpper()))
+                {
+                    await AttendanceMessager.IncorrectSignMessage(context);
+                    return false;
+                }
+                else
+                    return true;
+            });
+        }
     }
 }

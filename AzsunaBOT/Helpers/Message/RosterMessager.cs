@@ -36,15 +36,15 @@ namespace AzsunaBOT.Helpers.Message
             return builtString.ToString();
         }
 
-        public static async Task BuildRosterMessage(DiscordClient client, List<AttendanceModel> list, string day)
+        public static async Task BuildRosterMessage(DiscordClient client, List<AttendanceModel> list, string day, string channelId)
         {
-            await RoleProcessor.SortAllAsync(list);
+            await RoleLists.FillLists(list);
 
-            var channelId = await ChannelHelper.GetChannelId(day);
+            //var channelId = await DiscordServerHelper.GetChannelId(day);
 
-            await client.SendMessageAsync(client.GetChannelAsync(channelId).Result, FirstRoleMessage(RoleLists.FirstBatch).Result);
-            await client.SendMessageAsync(client.GetChannelAsync(channelId).Result, SecondRoleMessage(RoleLists.SecondBatch).Result);
-            await client.SendMessageAsync(client.GetChannelAsync(channelId).Result, ThirdRoleMessage(RoleLists.ThirdBatch).Result);
+            await client.SendMessageAsync(client.GetChannelAsync(Convert.ToUInt64(channelId)).Result, FirstRoleMessage(RoleLists.FirstBatch).Result);
+            await client.SendMessageAsync(client.GetChannelAsync(Convert.ToUInt64(channelId)).Result, SecondRoleMessage(RoleLists.SecondBatch).Result);
+            await client.SendMessageAsync(client.GetChannelAsync(Convert.ToUInt64(channelId)).Result, ThirdRoleMessage(RoleLists.ThirdBatch).Result);
         }
 
         public static async Task<DiscordMessage> SetWoeMessage(CommandContext context, string day, DateTime? date = null)

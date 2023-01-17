@@ -23,56 +23,46 @@ namespace AzsunaBOT.Commands
             _config = config;
         }
 
-
         // Needs to be restricted to a channel
         [RequireRoles(RoleCheckMode.Any, "woe", "guest")]
         [Command("setrole")]
-        public async Task Setrole(CommandContext context, string day, string charName, string role, string sign, string comments = "")
+        public async Task Setrole(CommandContext context, string day, string mode, string charName, string role, string sign, string comments = "")
         {
-            if (!string.IsNullOrEmpty(day) && !string.IsNullOrEmpty(charName) && !string.IsNullOrEmpty(role) && !string.IsNullOrEmpty(sign))
+            if (string.IsNullOrEmpty(day) || string.IsNullOrEmpty(mode) || string.IsNullOrEmpty(charName) || string.IsNullOrEmpty(role) || string.IsNullOrEmpty(sign))
             {
-                if (Enum.IsDefined(typeof(WoedaysShort), day.ToUpper()) && Enum.IsDefined(typeof(RolesAll), role.ToUpper()) && Enum.IsDefined(typeof(Signs), sign.ToUpper()))
+                await AttendanceMessager.IncorrectCredentialsMessage(context);
+                return;
+            }
+
+            if (!await AttendanceHelper.IsValueOfEnum(context, day, mode, role, sign))
+                return;
+
+            try
+            {
+                var woeDay = RosterHelper.LoadWoeDay(context, day, mode, _data, _config);
+
+                if (woeDay.IsClosed == true)
                 {
-                    try
-                    {
-                        var woeList = _data.LoadData<WoeModel, dynamic>("sp_adminLookUp", new { @tblName = "woedays" }, _config.GetConnectionString("AzsunaBOT")).Result;
-
-                        if (woeList != null && woeList.Any(x => x.Day.ToUpper() == DateFormatter.ConvertWeekDay(day).Result.ToUpper()))
-                        {
-                            try
-                            {
-                                // Correct table needs to be selected depending on which day was passed in!
-
-
-                                var signUpModel = new SignUpModel()
-                                {
-                                    WoeDate = DateFormatter.FormatDate(day).Result,
-                                    DiscordTag = context.Member.Mention,
-                                    CharName = charName,
-                                    Role = role,
-                                    Sign = sign,
-                                    Comments = comments
-                                };
-                                //await _data.SaveData<SignUpModel>("sp_userWoeSignUp", signUpModel, _config.GetConnectionString("AzsunaBOT"));
-                                RosterHelper.RefreshRostersAsync(_data, _config);
-                            }
-                            catch (Exception e)
-                            {
-                                await AttendanceMessager.AlreadySignedMessage(context);
-                                Console.WriteLine(e.Message);
-                            }
-                        }
-                    }
-                    catch (Exception e) { Console.WriteLine(e.Message); }
+                    await AttendanceMessager.SignUpBlocked(context, day, mode);
+                    return;
                 }
-                else if (!Enum.IsDefined(typeof(WoedaysShort), day.ToUpper()))
-                    await AttendanceMessager.IncorrectDayMessage(context);
-                else if (!Enum.IsDefined(typeof(RolesAll), role.ToUpper()))
-                    await AttendanceMessager.IncorrectRoleMessage(context);
-                else if (!Enum.IsDefined(typeof(Signs), sign.ToUpper()))
-                    await AttendanceMessager.IncorrectSignMessage(context);
-                else
-                    await AttendanceMessager.IncorrectCredentialsMessage(context);
+
+                try
+                {
+                    var signUpModel = await RosterHelper.FillSignUpModel(context, day, mode, charName, role, sign, comments);
+                    //await _data.SaveData<SignUpModel>("sp_userWoeSignUp", signUpModel, _config.GetConnectionString("AzsunaBOT"));
+                    RosterHelper.RefreshRostersAsync(context, _data, _config);
+                }
+                catch (Exception e)
+                {
+                    await AttendanceMessager.AlreadySignedMessage(context);
+                    Console.WriteLine(e.Message);
+                }
+            }
+            catch (Exception e)
+            {
+                await AttendanceMessager.NotFound(context, day);
+                Console.WriteLine(e.Message);
             }
         }
     }

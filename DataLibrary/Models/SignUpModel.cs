@@ -2,7 +2,7 @@
 {
     public class SignUpModel
     {
-        public string WoeDate { get; set; }
+        public string Info { get; set; }
         public string DiscordTag { get; set; }
         public string CharName { get; set; }
         public string Role { get; set; }

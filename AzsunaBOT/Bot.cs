@@ -44,7 +44,6 @@ namespace AzsunaBOT
             };
 
             Client = new DiscordClient(config);
-
             Client.Ready += OnClientReady;
             Client.MessageCreated += MessageListener.OnMessageSent;
 

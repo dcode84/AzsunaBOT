@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AzsunaBOT.Helpers
 {
-    public static class ChannelHelper
+    public static class DiscordServerHelper
     {
         private static List<ChannelModel> _channels;
 
